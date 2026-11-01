@@ -460,16 +460,6 @@ class _SettingsPageState extends State<SettingsPage> {
             title: const Text('Privacy'),
             onTap: () => context.push('/privacy'),
           ),
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            title: const Text('Reset local demo'),
-            subtitle: const Text(
-              'Restores the sample campus and signs you out.',
-            ),
-            onTap: () async {
-              await store.resetDemo();
-            },
-          ),
           const Divider(),
           const Text(
             'Delete account',

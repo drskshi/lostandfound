@@ -5,7 +5,6 @@ import '../../app.dart';
 import '../../backend/campus_remote.dart';
 import '../../backend/google_auth.dart';
 import '../../backend/supabase_bootstrap.dart';
-import '../../data/logic.dart';
 import '../../data/store.dart';
 import '../../domain/access_role.dart';
 import '../../theme/campus_theme.dart';
@@ -123,15 +122,6 @@ class OnboardingPage extends StatelessWidget {
                 onPressed: () => CampusScope.of(context).finishOnboarding(),
                 child: const Text('Continue'),
               ),
-              const SizedBox(height: 8),
-              Text(
-                'Sample campus for a student project. This is not a university sign-in.',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Theme.of(context).colorScheme.onSurface
-                      .withValues(alpha: 0.55),
-                ),
-              ),
             ],
           ),
         ),
@@ -148,12 +138,11 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _email = TextEditingController(
-    text: SupabaseBootstrap.isReady ? '' : 'amara@ravensbourne.example',
-  );
+  final _email = TextEditingController();
   final _password = TextEditingController();
   String? _error;
   bool _google = false;
+  bool _showPassword = false;
 
   @override
   void dispose() {
@@ -165,116 +154,138 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final store = CampusScope.of(context);
+    final muted = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.68);
     return Scaffold(
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(24),
-          children: [
-            const SizedBox(height: 12),
-            const CampusLogo(),
-            const SizedBox(height: 28),
-            const Text(
-              'Your campus.\nA little more connected.',
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.w800,
-                height: 1.1,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              SupabaseBootstrap.isReady
-                  ? 'Sign in with the shared campus database. New Google accounts join as students.'
-                  : 'Sign in to find what is missing and help someone else do the same.',
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface
-                    .withValues(alpha: 0.7),
-                height: 1.4,
-              ),
-            ),
-            const SizedBox(height: 22),
-            InputDecorator(
-              decoration: const InputDecoration(
-                labelText: 'University',
-                prefixIcon: Icon(Icons.school_outlined),
-              ),
-              child: Text(
-                SupabaseBootstrap.isReady
-                    ? 'Northbridge College'
-                    : 'Ravensbourne University',
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              key: const Key('email-field'),
-              controller: _email,
-              keyboardType: TextInputType.emailAddress,
-              autocorrect: false,
-              decoration: const InputDecoration(labelText: 'University email'),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              key: const Key('password-field'),
-              controller: _password,
-              obscureText: true,
-              decoration: const InputDecoration(labelText: 'Password'),
-              onSubmitted: (_) => _submit(store),
-            ),
-            if ((_error ?? store.authMessage) != null) ...[
-              const SizedBox(height: 10),
-              Text(
-                _error ?? store.authMessage!,
-                style: const TextStyle(color: Color(0xFFB42318)),
-              ),
-            ],
-            const SizedBox(height: 16),
-            FilledButton(
-              key: const Key('sign-in-button'),
-              onPressed: () => _submit(store),
-              child: const Text('Sign in'),
-            ),
-            const SizedBox(height: 10),
-            OutlinedButton.icon(
-              onPressed: _google ? null : () => _googleSignIn(),
-              icon: const Icon(Icons.g_mobiledata, size: 28),
-              label: Text(_google ? 'Opening Google…' : 'Continue with Google'),
-            ),
-            const SizedBox(height: 8),
-            TextButton(
-              onPressed: () => context.push('/recover'),
-              child: const Text('Forgot password'),
-            ),
-            TextButton(
-              onPressed: () => context.push('/register'),
-              child: const Text('Create an account'),
-            ),
-            TextButton(
-              onPressed: () => context.push('/privacy'),
-              child: const Text('Privacy'),
-            ),
-            const SizedBox(height: 8),
-            ExpansionTile(
-              tilePadding: EdgeInsets.zero,
-              title: const Text('Demo accounts on this phone'),
-              children: [
-                Text(
-                  'These fictional accounts already have a role stored with them. The sign-in form does not let you pick admin. Shared password: $demoPassword',
-                  style: const TextStyle(height: 1.4),
-                ),
-                const SizedBox(height: 8),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 440),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                const CampusLogo(),
+                const SizedBox(height: 20),
                 const Text(
-                  'amara@ravensbourne.example · student\ntom@ravensbourne.example · finder\ndave@ravensbourne.example · lost property office\nrachel@ravensbourne.example · campus admin\nleo@kingsmere.example · another campus',
+                  'Your campus.\nA little more connected.',
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w800,
+                    height: 1.05,
+                    letterSpacing: -0.6,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'Sign in to see what your campus has found. New accounts join as students.',
+                  style: TextStyle(color: muted, height: 1.45),
+                ),
+                const SizedBox(height: 22),
+                const InputDecorator(
+                  decoration: InputDecoration(
+                    labelText: 'University',
+                    prefixIcon: Icon(Icons.school_outlined),
+                  ),
+                  child: Text('Northbridge College'),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  key: const Key('email-field'),
+                  controller: _email,
+                  keyboardType: TextInputType.emailAddress,
+                  autocorrect: false,
+                  textInputAction: TextInputAction.next,
+                  decoration: const InputDecoration(
+                    labelText: 'University email',
+                    prefixIcon: Icon(Icons.mail_outline),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  key: const Key('password-field'),
+                  controller: _password,
+                  obscureText: !_showPassword,
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    prefixIcon: const Icon(Icons.lock_outline),
+                    suffixIcon: IconButton(
+                      tooltip: _showPassword ? 'Hide password' : 'Show password',
+                      onPressed: () =>
+                          setState(() => _showPassword = !_showPassword),
+                      icon: Icon(
+                        _showPassword
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
+                      ),
+                    ),
+                  ),
+                  onSubmitted: (_) => _submit(store),
                 ),
                 Align(
-                  alignment: Alignment.centerLeft,
+                  alignment: Alignment.centerRight,
                   child: TextButton(
-                    onPressed: store.resetDemo,
-                    child: const Text('Reset local demo data'),
+                    style: TextButton.styleFrom(
+                      visualDensity: VisualDensity.compact,
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                    ),
+                    onPressed: () => context.push('/recover'),
+                    child: const Text('Forgot password'),
+                  ),
+                ),
+                if ((_error ?? store.authMessage) != null) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    _error ?? store.authMessage!,
+                    style: const TextStyle(color: Color(0xFFB42318), height: 1.4),
+                  ),
+                  const SizedBox(height: 8),
+                ],
+                FilledButton(
+                  key: const Key('sign-in-button'),
+                  onPressed: () => _submit(store),
+                  child: const Text('Sign in'),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    const Expanded(child: Divider()),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: Text('or', style: TextStyle(color: muted)),
+                    ),
+                    const Expanded(child: Divider()),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                OutlinedButton.icon(
+                  onPressed: _google ? null : () => _googleSignIn(),
+                  icon: const Icon(Icons.g_mobiledata, size: 28),
+                  label: Text(
+                    _google ? 'Opening Google…' : 'Continue with Google',
+                  ),
+                ),
+                const SizedBox(height: 18),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('New here?', style: TextStyle(color: muted)),
+                    TextButton(
+                      onPressed: () => context.push('/register'),
+                      child: const Text('Create an account'),
+                    ),
+                  ],
+                ),
+                Center(
+                  child: TextButton(
+                    onPressed: () => context.push('/privacy'),
+                    child: const Text('Privacy'),
                   ),
                 ),
               ],
+              ),
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -352,7 +363,7 @@ class _RegisterPageState extends State<RegisterPage> {
             keyboardType: TextInputType.emailAddress,
             decoration: const InputDecoration(
               labelText: 'Email',
-              hintText: 'name@ravensbourne.example',
+              hintText: 'name@university.ac.uk',
             ),
           ),
           const SizedBox(height: 12),
