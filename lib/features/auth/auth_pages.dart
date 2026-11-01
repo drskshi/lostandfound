@@ -148,7 +148,9 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _email = TextEditingController(text: 'amara@ravensbourne.example');
+  final _email = TextEditingController(
+    text: SupabaseBootstrap.isReady ? '' : 'amara@ravensbourne.example',
+  );
   final _password = TextEditingController();
   String? _error;
   bool _google = false;
@@ -191,12 +193,16 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
             const SizedBox(height: 22),
-            const InputDecorator(
-              decoration: InputDecoration(
+            InputDecorator(
+              decoration: const InputDecoration(
                 labelText: 'University',
                 prefixIcon: Icon(Icons.school_outlined),
               ),
-              child: Text('Ravensbourne University'),
+              child: Text(
+                SupabaseBootstrap.isReady
+                    ? 'Northbridge College'
+                    : 'Ravensbourne University',
+              ),
             ),
             const SizedBox(height: 12),
             TextField(
