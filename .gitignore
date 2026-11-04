@@ -50,6 +50,10 @@ app.*.map.json
 # Local Supabase project URL and publishable key. Never commit this file.
 config/supabase.dev.json
 
+# Next.js website. Flutter source stays in this repository; Vercel builds only this app.
+/node_modules/
+/.next/
+
 # Private environment files, mail passwords, and OAuth secrets.
 .env
 .env.*
