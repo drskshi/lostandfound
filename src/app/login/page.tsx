@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { signIn, signInWithGoogle } from "@/app/actions";
 import { SubmitButton } from "@/components/submit-button";
+import { supabaseConfigured } from "@/lib/supabase/server";
 
 export default async function LoginPage({
   searchParams,
@@ -13,6 +14,11 @@ export default async function LoginPage({
       <h1 className="font-serif text-4xl">Sign in</h1>
       <p className="mt-2 text-ink/70">Use the campus account. New accounts join as students.</p>
       {error ? <p className="mt-4 rounded-2xl bg-white px-4 py-3 text-sm text-brass">{error}</p> : null}
+      {supabaseConfigured() ? null : (
+        <p className="mt-4 rounded-2xl bg-white px-4 py-3 text-sm text-brass">
+          This deployment is not connected to the campus database yet.
+        </p>
+      )}
       <form action={signIn} className="mt-6 grid gap-4">
         <label className="grid gap-1.5 text-sm font-medium">
           Email

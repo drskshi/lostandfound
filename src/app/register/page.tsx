@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { registerAccount } from "@/app/actions";
 import { SubmitButton } from "@/components/submit-button";
+import { supabaseConfigured } from "@/lib/supabase/server";
 
 export default async function RegisterPage({
   searchParams,
@@ -14,6 +15,11 @@ export default async function RegisterPage({
       <p className="mt-2 text-ink/70">The campus database assigns the student role. You cannot choose a staff role here.</p>
       {error ? <p className="mt-4 rounded-2xl bg-white px-4 py-3 text-sm text-brass">{error}</p> : null}
       {notice ? <p className="mt-4 rounded-2xl bg-white px-4 py-3 text-sm">{notice}</p> : null}
+      {supabaseConfigured() ? null : (
+        <p className="mt-4 rounded-2xl bg-white px-4 py-3 text-sm text-brass">
+          This deployment is not connected to the campus database yet.
+        </p>
+      )}
       <form action={registerAccount} className="mt-6 grid gap-4">
         <label className="grid gap-1.5 text-sm font-medium">
           Name

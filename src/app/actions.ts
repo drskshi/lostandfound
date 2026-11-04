@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { categories, colours } from "@/lib/catalogue";
 import { isStaff, readableError, requireProfile } from "@/lib/campus";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, supabaseConfigured } from "@/lib/supabase/server";
 
 function clean(value: FormDataEntryValue | null) {
   return typeof value === "string" ? value.trim() : "";
@@ -19,7 +19,10 @@ async function siteOrigin() {
   return headerList.get("origin") || process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 }
 
+const notConnected = "This deployment is not connected to the campus database yet.";
+
 export async function signIn(formData: FormData) {
+  if (!supabaseConfigured()) redirect(`/login?error=${encodeURIComponent(notConnected)}`);
   const email = clean(formData.get("email")).toLowerCase();
   const password = String(formData.get("password") ?? "");
   const supabase = await createClient();
@@ -29,6 +32,7 @@ export async function signIn(formData: FormData) {
 }
 
 export async function signInWithGoogle() {
+  if (!supabaseConfigured()) redirect(`/login?error=${encodeURIComponent(notConnected)}`);
   const supabase = await createClient();
   const origin = await siteOrigin();
   const { data, error } = await supabase.auth.signInWithOAuth({
@@ -42,6 +46,7 @@ export async function signInWithGoogle() {
 }
 
 export async function registerAccount(formData: FormData) {
+  if (!supabaseConfigured()) redirect(`/register?error=${encodeURIComponent(notConnected)}`);
   const name = clean(formData.get("name"));
   const email = clean(formData.get("email")).toLowerCase();
   const password = String(formData.get("password") ?? "");

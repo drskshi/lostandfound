@@ -47,8 +47,9 @@ app.*.map.json
 # Widget Preview related
 .widget_preview/
 
-# Local Supabase project URL and publishable key. Never commit this file.
+# Local Supabase project URL and publishable key. Never commit these files.
 config/supabase.dev.json
+config/vercel.production.env
 
 # Next.js website. Flutter source stays in this repository; Vercel builds only this app.
 /node_modules/
