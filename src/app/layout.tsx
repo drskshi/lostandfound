@@ -14,6 +14,8 @@ const fraunces = Fraunces({
   variable: "--font-fraunces",
 });
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Lost & Found",
   description: "Northbridge College lost and found, on the shared campus record.",
